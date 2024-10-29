@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { OpaqueToken, OpaqueTokenDocument } from './opaque-token.schema';
 import { Model } from 'mongoose';
-import crypto from 'crypto';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class OpaqueTokenService {
@@ -12,7 +12,7 @@ export class OpaqueTokenService {
   ) {}
 
   async create(userId: string, permissions: string[]): Promise<OpaqueToken> {
-    const tokenValue = crypto.randomBytes(32).toString('hex');
+    const tokenValue = randomBytes(32).toString('hex');
     const token = new this.tokenModel({
       token: tokenValue,
       userId,

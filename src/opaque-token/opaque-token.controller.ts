@@ -1,12 +1,15 @@
 import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { OpaqueTokenService } from './opaque-token.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PoliciesGuard } from '../casl/polices.guard';
+import { CheckPolicies } from '../casl/check-policies.decorator';
+import { BearerTokenAuthGuard } from '../auth/bearer-token-auth.guard';
 
 @Controller('opaque-token')
 export class OpaqueTokenController {
   constructor(private tokenService: OpaqueTokenService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BearerTokenAuthGuard, PoliciesGuard)
+  @CheckPolicies((ability) => ability.can('create', 'OpaqueToken'))
   @Post('generate')
   async generateToken(@Request() req, @Body() body) {
     const permissions = body.permissions;
@@ -14,14 +17,16 @@ export class OpaqueTokenController {
     return { token: token.token };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BearerTokenAuthGuard, PoliciesGuard)
+  @CheckPolicies((ability) => ability.can('deactivate', 'OpaqueToken'))
   @Post('revoke')
   async revokeToken(@Body() body) {
     await this.tokenService.revoke(body.token);
     return { message: 'Token revogado com sucesso' };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BearerTokenAuthGuard, PoliciesGuard)
+  @CheckPolicies((ability) => ability.can('edit', 'OpaqueToken'))
   @Post('update-permissions')
   async updatePermissions(@Body() body) {
     await this.tokenService.updatePermissions(body.token, body.permissions);

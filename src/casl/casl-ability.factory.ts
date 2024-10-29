@@ -6,7 +6,7 @@ import {
   ExtractSubjectType,
 } from '@casl/ability';
 
-export type Actions = 'manage' | 'create' | 'read' | 'update' | 'delete';
+export type Actions = 'create' | 'read' | 'edit' | 'deactivate';
 export type Subjects = 'Article' | 'User' | 'OpaqueToken' | 'all';
 
 export type AppAbility = Ability<[Actions, Subjects]>;

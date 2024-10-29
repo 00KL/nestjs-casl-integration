@@ -7,8 +7,6 @@ import { UsersModule } from './user/user.module';
 import { OpaqueTokenModule } from './opaque-token/opaque-token.module';
 import { ArticlesModule } from './article/article.module';
 import { CaslModule } from './casl/casl.module';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -20,12 +18,6 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     CaslModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard, // Registra o PoliciesGuard como global
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule {}
