@@ -19,7 +19,6 @@ export class BearerTokenStrategy extends PassportStrategy(
   }
 
   async validate(req: Request): Promise<any> {
-    console.log('BearerTokenStrategy');
     // Extrai o token do cabeçalho Authorization
     const authHeader = req.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -33,7 +32,6 @@ export class BearerTokenStrategy extends PassportStrategy(
       try {
         // Tenta validar como JWT
         const payload = this.jwtService.verify(token);
-        console.log('payload');
 
         // Busca o usuário e suas permissões no banco de dados
         const user = await this.usersService.findById(payload.userId);

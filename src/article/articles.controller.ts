@@ -5,15 +5,15 @@ import { BearerTokenAuthGuard } from '../auth/bearer-token-auth.guard';
 
 @Controller('articles')
 export class ArticlesController {
-  @UseGuards(BearerTokenAuthGuard, PoliciesGuard)
   @CheckPolicies((ability) => ability.can('create', 'Article'))
+  @UseGuards(BearerTokenAuthGuard, PoliciesGuard)
   @Post()
   createArticle() {
     return 'Article created';
   }
 
-  @UseGuards(BearerTokenAuthGuard, PoliciesGuard)
   @CheckPolicies((ability) => ability.can('read', 'Article'))
+  @UseGuards(BearerTokenAuthGuard, PoliciesGuard)
   @Get()
   getArticles() {
     return 'Articles list';
