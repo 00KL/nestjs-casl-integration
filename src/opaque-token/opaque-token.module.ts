@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { OpaqueTokenService } from './opaque-token.service';
 import { OpaqueToken, OpaqueTokenSchema } from './opaque-token.schema';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -11,11 +11,11 @@ import { CaslModule } from '../casl/casl.module';
     MongooseModule.forFeature([
       { name: OpaqueToken.name, schema: OpaqueTokenSchema },
     ]),
-    AuthModule,
+    forwardRef(() => AuthModule),
     CaslModule,
   ],
   providers: [OpaqueTokenService],
   controllers: [OpaqueTokenController],
-  exports: [],
+  exports: [OpaqueTokenService],
 })
 export class OpaqueTokenModule {}
