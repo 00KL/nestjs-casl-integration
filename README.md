@@ -1,73 +1,138 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Projeto NestJS com Autenticação JWT e Tokens Opacos
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este projeto é uma API RESTful desenvolvida com **NestJS** que implementa autenticação baseada em **JWT** e **tokens opacos**. A API fornece controle de permissões e autorização utilizando o módulo **CASL** (Ability Based Authorization) para garantir o acesso seguro aos recursos.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Requisitos
 
-## Description
+- **Node.js** (v14+)
+- **NestJS** (v8+)
+- **MongoDB**: É necessário configurar um banco de dados MongoDB para o armazenamento de usuários e tokens opacos.
+- **Configurações do ambiente**: O projeto depende de variáveis de ambiente, incluindo a chave secreta do JWT e a URI do MongoDB.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Instalação
 
-## Installation
+1. **Clone o repositório**:
 
-```bash
-$ npm install
+   ```bash
+   git clone git@github.com:00KL/nestjs-casl-integration.git
+   cd nestjs-casl-integration
+   ```
+
+2. **Instale as dependências**:
+
+   ```bash
+   npm install
+   ```
+
+3. **Configuração do Arquivo `.env`**:
+   Crie um arquivo `.env` na raiz do projeto e adicione as seguintes variáveis:
+
+   ```plaintext
+   MONGO_URI=<sua_mongo_uri>
+   JWT_SECRET=<sua_chave_secreta_para_jwt>
+   ```
+
+   Já existe um exemplo de `.env` já presente no sistema.
+
+4. **Inicie o Servidor**:
+   ```bash
+   npm run start:dev
+   ```
+
+## Endpoints e Funcionalidades
+
+### 1. **Articles Controller** (`/articles`)
+
+- **POST `/articles`** - Criação de um artigo
+
+  - **Guards**: `BearerTokenAuthGuard`, `PoliciesGuard`
+  - **Políticas**: Requer permissão para `create` um `Article`
+  - **Resposta**: `Article created`
+
+- **GET `/articles`** - Listagem de artigos
+  - **Guards**: `BearerTokenAuthGuard`, `PoliciesGuard`
+  - **Políticas**: Requer permissão para `read` um `Article`
+  - **Resposta**: `Articles list`
+
+### 2. **Opaque Token Controller** (`/opaque-token`)
+
+Este controller lida com a geração e gerenciamento de tokens opacos para acesso a recursos.
+
+- **POST `/opaque-token/generate`** - Geração de token opaco
+
+  - **Guards**: `BearerTokenAuthGuard`, `PoliciesGuard`
+  - **Políticas**: Requer permissão para `create` um `OpaqueToken`
+  - **Parâmetros**: `permissions` (no corpo da requisição)
+  - **Resposta**: `{ token: <token_gerado> }`
+
+- **POST `/opaque-token/:token/deactivate`** - Desativação de um token opaco
+
+  - **Guards**: `BearerTokenAuthGuard`, `PoliciesGuard`
+  - **Políticas**: Requer permissão para `deactivate` um `OpaqueToken`
+  - **Parâmetros**: `token` (nos parâmetros da rota)
+  - **Resposta**: `{ message: 'Token revogado com sucesso' }`
+
+- **POST `/opaque-token/:token/permissions/update`** - Atualização de permissões do token opaco
+  - **Guards**: `BearerTokenAuthGuard`, `PoliciesGuard`
+  - **Políticas**: Requer permissão para `edit` um `OpaqueToken`
+  - **Parâmetros**: `token` (nos parâmetros da rota), `permissions` (no corpo da requisição)
+  - **Resposta**: `{ message: 'Permissões atualizadas com sucesso' }`
+
+### 3. **Users Controller** (`/users`)
+
+Este controller gerencia a criação e atualização de permissões dos usuários.
+
+- **POST `/users`** - Criação de um novo usuário
+
+  - **Parâmetros**: `username`, `password`, `permissions` (no corpo da requisição)
+  - **Resposta**: `{ message: 'User created successfully', user: { username, permissions } }`
+  - **Erro**: Se o `username` já existir, retorna `409 Conflict`.
+
+- **POST `/users/:id/permissions/update`** - Atualização de permissões do usuário
+  - **Parâmetros**: `id` (nos parâmetros da rota), `permissions` (no corpo da requisição)
+  - **Resposta**: `{ message: 'Permissions updated successfully', user: { username, permissions } }`
+  - **Erro**: Retorna `404 Not Found` se o usuário não for encontrado.
+
+### 4. **Auth Controller** (`/auth`)
+
+Este controller gerencia a autenticação e geração de tokens JWT para usuários.
+
+- **POST `/auth/login`** - Autenticação do usuário e geração de JWT
+  - **Parâmetros**: `username`, `password` (no corpo da requisição)
+  - **Resposta**: `{ access_token: <token_jwt> }`
+  - **Erro**: Retorna `Usuário ou senha incorretos` se as credenciais forem inválidas.
+
+## Estrutura de Diretórios
+
+```plaintext
+src
+├── auth
+│   ├── auth.controller.ts          # Controller de autenticação
+│   ├── auth.service.ts             # Serviço de autenticação
+│   ├── bearer-token-auth.guard.ts  # Guard de autenticação com token Bearer
+│   ├── bearer-token.strategy.ts    # Estratégia JWT
+├── articles
+│   ├── articles.controller.ts      # Controller de artigos
+│   └── articles.service.ts         # Serviço de artigos
+├── casl
+│   ├── check-policies.decorator.ts # Decorador de políticas CASL
+│   ├── casl-ability.factory.ts     # Fábrica de habilidades CASL
+│   └── policies.guard.ts           # Guard de políticas CASL
+├── opaque-token
+│   ├── opaque-token.controller.ts  # Controller de tokens opacos
+│   ├── opaque-token.service.ts     # Serviço de tokens opacos
+│   └── opaque-token.schema.ts      # Schema para tokens opacos no MongoDB
+├── users
+│   ├── users.controller.ts         # Controller de usuários
+│   ├── users.service.ts            # Serviço de usuários
+│   └── user.schema.ts              # Schema de usuários no MongoDB
+└── main.ts                         # Arquivo principal da aplicação
 ```
 
-## Running the app
+## Considerações Finais
 
-```bash
-# development
-$ npm run start
+Este projeto demonstra uma estrutura básica de autenticação com tokens JWT e tokens opacos no NestJS, incluindo controle de permissões com CASL.
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+Para mais detalhes sobre o NestJS, consulte a [documentação oficial](https://docs.nestjs.com/).
+Para mais detalhes sobre o CASL, consulte a [documentação oficial](https://casl.js.org/v5/en/guide/intro)
+Para mais detalhes sobre o Passport (lib de autorização), consulte [documentação oficial](https://www.passportjs.org/)
