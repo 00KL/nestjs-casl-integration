@@ -10,7 +10,9 @@ import { CaslModule } from './casl/casl.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/casl-integration'),
+    MongooseModule.forRoot(
+      process.env.MONGO_URI || 'mongodb://localhost/casl-integration',
+    ),
     AuthModule,
     UsersModule,
     OpaqueTokenModule,
