@@ -27,5 +27,13 @@ export class UsersService {
     return this.userModel.findById(id);
   }
 
+  // Atualiza permissões de um usuário
+  async updatePermissions(
+    id: string,
+    permissions: string[],
+  ): Promise<User | undefined> {
+    return this.userModel.findByIdAndUpdate(id, { permissions }, { new: true });
+  }
+
   // Outras funções conforme necessário
 }

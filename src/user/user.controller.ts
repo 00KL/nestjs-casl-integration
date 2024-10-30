@@ -4,6 +4,7 @@ import {
   Body,
   HttpException,
   HttpStatus,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 // import { CreateUserDto } from './dto/create-user.dto';
@@ -29,6 +30,26 @@ export class UsersController {
       user: {
         username: newUser.username,
         permissions: newUser.permissions,
+      },
+    };
+  }
+
+  @Post(':id/permissions/update')
+  async updatePermissions(@Request() req, @Body() body: any) {
+    // Atualiza as permissões do usuário
+    const updatedUser = await this.usersService.updatePermissions(
+      req.params.id,
+      body.permissions,
+    );
+    if (!updatedUser) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      message: 'Permissions updated successfully',
+      user: {
+        username: updatedUser.username,
+        permissions: updatedUser.permissions,
       },
     };
   }

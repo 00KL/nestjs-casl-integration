@@ -19,17 +19,19 @@ export class OpaqueTokenController {
 
   @UseGuards(BearerTokenAuthGuard, PoliciesGuard)
   @CheckPolicies((ability) => ability.can('deactivate', 'OpaqueToken'))
-  @Post('revoke')
-  async revokeToken(@Body() body) {
-    await this.tokenService.revoke(body.token);
+  @Post(':token/deactivate')
+  async revokeToken(@Request() req) {
+    const token = req.params.token;
+    await this.tokenService.revoke(token);
     return { message: 'Token revogado com sucesso' };
   }
 
   @UseGuards(BearerTokenAuthGuard, PoliciesGuard)
   @CheckPolicies((ability) => ability.can('edit', 'OpaqueToken'))
-  @Post('update-permissions')
-  async updatePermissions(@Body() body) {
-    await this.tokenService.updatePermissions(body.token, body.permissions);
+  @Post(':token/permissions/update')
+  async updatePermissions(@Request() req, @Body() body) {
+    const token = req.params.token;
+    await this.tokenService.updatePermissions(token, body.permissions);
     return { message: 'Permissões atualizadas com sucesso' };
   }
 }
